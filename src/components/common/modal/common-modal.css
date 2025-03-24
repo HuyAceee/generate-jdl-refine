@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.ant-modal-footer {
+  @apply flex justify-center w-full;
+}
+
+.ant-modal-footer button {
+  @apply mx-2;
+}

@@ -1,0 +1,10 @@
+@import url('./app.css');
+
+.ant-layout-sider,
+.ant-layout-sider-trigger,
+.ant-layout-sider-children > div {
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+  flex: 0 0 250px !important;
+}

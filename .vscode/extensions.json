@@ -1,0 +1,28 @@
+{
+  "recommendations": [
+    "adpyke.codesnap",
+    "be5invis.toml",
+    "bradlc.vscode-tailwindcss",
+    "dbaeumer.vscode-eslint",
+    "donjayamanne.githistory",
+    "eamodio.gitlens",
+    "EditorConfig.EditorConfig",
+    "esbenp.prettier-vscode",
+    "figma.figma-vscode-extension",
+    "firsttris.vscode-jest-runner",
+    "GitHub.vscode-pull-request-github",
+    "IronGeek.vscode-env",
+    "mgmcdermott.vscode-language-babel",
+    "mhutchie.git-graph",
+    "mquandalle.graphql",
+    "naumovs.color-highlight",
+    "nrwl.angular-console",
+    "stylelint.vscode-stylelint",
+    "ue.alphabetical-sorter",
+    "usernamehw.errorlens",
+    "vscode-icons-team.vscode-icons",
+    "wayou.vscode-todo-highlight",
+    "YoavBls.pretty-ts-errors",
+    "SonarSource.sonarlint-vscode"
+  ]
+}

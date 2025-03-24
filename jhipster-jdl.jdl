@@ -1,0 +1,105 @@
+application {
+  config {
+    baseName sampleApp
+    applicationType monolith
+    packageName com.example.sample
+    authenticationType jwt
+    buildTool maven
+    clientFramework react
+    databaseType sql
+    devDatabaseType h2Disk
+    prodDatabaseType postgresql
+    cacheProvider ehcache
+    enableHibernateCache true
+    testFrameworks [cypress, jest]
+    clientTheme materia
+    skipUserManagement true
+  }
+  entities *
+}
+
+enum Role {
+  USER, ADMIN, MANAGER
+}
+
+enum Gender {
+  MALE, FEMALE
+}
+
+entity Employee {
+  username String required unique min(3) max(20)
+  email String required unique
+  password String required
+  phoneNumber String required
+  url String
+  role Role required
+  gender Gender required
+}
+
+entity Profile {
+  firstName String
+  lastName String
+  phone String
+  address String
+}
+
+entity Post {
+  title String required
+  content TextBlob required
+  createdAt Instant required
+}
+
+entity Comment {
+  content String required
+  createdAt Instant required
+}
+
+entity Category {
+  name String required unique
+}
+
+entity Tag {
+  name String required unique
+}
+
+entity Order {
+  orderDate Instant required
+  totalAmount BigDecimal required
+  status String required
+}
+
+entity Product {
+  name String required unique
+  price BigDecimal required
+  stock Integer required
+}
+
+entity OrderItem {
+  quantity Integer
+  price BigDecimal
+}
+
+/* 📌 Định nghĩa quan hệ giữa các entity */
+relationship OneToOne {
+  Employee{profile} to Profile{employee}
+}
+
+relationship OneToMany {
+  Employee{posts} to Post{author}
+  Post{comments} to Comment{post}
+}
+
+relationship ManyToMany {
+  Post{tags(name)} to Tag{posts}
+  Product{categories(name)} to Category{products}
+}
+
+relationship ManyToOne {
+  OrderItem{order} to Order{items}
+  OrderItem{product} to Product{orderItems}
+}
+
+/* 📌 Cấu hình service, DTO, pagination */
+service all with serviceImpl
+
+dto all with mapstruct

@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', sans-serif;
+  }
+
+  body {
+    @apply font-sans;
+  }
+
+  h1 {
+    font-weight: 600;
+    font-size: 64px;
+    line-height: 64px;
+    letter-spacing: 0%;
+  }
+
+  h2 {
+    font-weight: 600;
+    font-size: 48px;
+    line-height: 48px;
+    letter-spacing: 0%;
+  }
+
+  h3 {
+    font-weight: 600;
+    font-size: 40px;
+    line-height: 48px;
+    letter-spacing: 0%;
+  }
+
+  h4 {
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 40px;
+    letter-spacing: 0%;
+  }
+
+  h5 {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 32px;
+    letter-spacing: 0%;
+  }
+
+  .title-1-semi {
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 32px;
+    letter-spacing: 0%;
+  }
+
+  .title-1 {
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 32px;
+    letter-spacing: 0%;
+  }
+  .title-2-semi {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 24px;
+    letter-spacing: 0%;
+  }
+
+  .title-2 {
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 24px;
+    letter-spacing: 0%;
+  }
+
+  .body-1-bold {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 22px;
+    letter-spacing: 0%;
+  }
+  .body-1-semi {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+    letter-spacing: 0%;
+  }
+  .body-1 {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 22px;
+    letter-spacing: 0%;
+  }
+  .body-2-bold {
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 0%;
+  }
+  .body-2-semi {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 0%;
+  }
+  .body-2 {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 0%;
+  }
+  .body-3 {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 21px;
+    letter-spacing: 0%;
+  }
+
+  .caption-1-semi {
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: 0%;
+  }
+  .caption-1 {
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: 0%;
+  }
+  .caption-2-semi {
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0%;
+  }
+  .caption-2 {
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0%;
+  }
+  .caption-2 {
+    font-weight: 500;
+    font-size: 10px;
+    line-height: 14px;
+    letter-spacing: 0%;
+  }
+  .button-1 {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0%;
+  }
+  .button-2 {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 24px;
+    letter-spacing: 0%;
+  }
+}
