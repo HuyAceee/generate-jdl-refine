@@ -1,0 +1,58 @@
+# compiled output
+dist
+tmp
+/out-tsc
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# dependencies
+node_modules
+yarn.lock
+
+# Remixjs
+node_modules
+.cache
+build
+public/build
+.env
+
+# Nx cache
+.nx-cache
+.nx
+
+# Vercel deploy
+.vercel
+.next
+
+# Private folders
+project
+scripts
+__mock__

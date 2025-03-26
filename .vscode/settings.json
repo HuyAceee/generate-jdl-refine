@@ -1,0 +1,70 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true
+  },
+  "files.associations": {
+    "*.js": "javascript",
+    "*.jsx": "javascriptreact",
+    "*.ts": "typescript",
+    "*.tsx": "typescriptreact"
+  },
+  "editor.fontSize": 13,
+  "editor.fontWeight": "400",
+  "editor.lineHeight": 28,
+  "editor.tabSize": 2,
+  "editor.minimap.enabled": false,
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.formatOnSave": false
+  },
+  "[typescript]": {
+    "editor.formatOnSave": false
+  },
+  "[json]": {
+    "editor.formatOnSave": false
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": false
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.tslint": "explicit",
+    "source.fixAll": "explicit"
+  },
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  },
+  "editor.suggestSelection": "first",
+  "editor.inlineSuggest.enabled": true,
+  "editor.rulers": [120],
+  "editor.wordWrap": "on",
+  "editor.unicodeHighlight.invisibleCharacters": false,
+  "editor.unicodeHighlight.ambiguousCharacters": false,
+  "editor.unicodeHighlight.nonBasicASCII": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "explorer.compactFolders": false,
+  "explorer.confirmDelete": false,
+  "workbench.iconTheme": "vscode-icons",
+  "workbench.startupEditor": "newUntitledFile",
+  "search.useParentIgnoreFiles": true,
+  "search.useGlobalIgnoreFiles": true,
+  "todohighlight.isEnable": true,
+  "todohighlight.keywords": [
+    {
+      "text": "@lemanh-tuong:",
+      "color": "#333333",
+      "backgroundColor": "#EEEEEE"
+    }
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "eslint.validate": ["json"]
+}
