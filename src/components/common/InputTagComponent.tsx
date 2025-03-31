@@ -12,7 +12,7 @@ interface InputTagComponentProps {
   required?: boolean;
 }
 
-export const InputTagComponent: React.FC<InputTagComponentProps> = ({
+const InputTagComponent: React.FC<InputTagComponentProps> = ({
   name,
   control,
   label,
@@ -71,3 +71,5 @@ export const InputTagComponent: React.FC<InputTagComponentProps> = ({
     </Form.Item>
   );
 };
+
+export default InputTagComponent;

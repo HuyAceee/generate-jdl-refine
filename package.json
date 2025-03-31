@@ -55,6 +55,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
     "eslint-plugin-tailwindcss": "3.15.2",
+    "eslint-plugin-unused-imports": "^4.1.4",
     "husky": "8.0.3",
     "lint-staged": "15.2.7",
     "postcss": "8.4.38",
@@ -75,7 +76,9 @@
     "lint:prettier": "prettier --write \"{src,tests,types}/**/*.{vue,js,jsx,ts,tsx,json,css,less,scss,html,md}\"",
     "lint": "pnpm lint:eslint && pnpm lint:prettier",
     "typecheck": "bash -c tsc --noEmit",
-    "generate": "node --loader ts-node/esm scripts/generate.ts"
+    "generate-pages": "node scripts/generate-page.cjs",
+    "generate-models": "node scripts/generate-model.cjs",
+    "generate": "pnpm run generate-models && pnpm run generate-pages"
   },
   "browserslist": {
     "production": [

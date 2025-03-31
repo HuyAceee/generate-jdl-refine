@@ -20,6 +20,10 @@ function toCamelCase(str) {
     .replace(/\s+|[_-]/g, '');
 }
 
+function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // Chuyển kiểu JDL sang TypeScript (fix lỗi enum bị any)
 function mapJDLTypeToTS(jdlType, enums) {
   return enums.hasOwnProperty(jdlType)
@@ -38,14 +42,16 @@ function mapJDLTypeToTS(jdlType, enums) {
 }
 
 // Tạo defaultValues từ entity
-function generateDefaultValues(fields) {
+function generateDefaultValues(fields, enums) {
   return `{\n${fields
-    .map(({ name, type }) => `${name}: ${getDefaultValue(type)},`)
+    .map(({ name, type }) => `${name}: ${getDefaultValue(type, enums)},`)
     .join('\n')}\n}`
 }
 
 // Mapping kiểu dữ liệu sang giá trị mặc định
 function getDefaultValue(type) {
+  const keys = Object.keys(enums);
+  const enumKeys = keys.map(key => key + 'Enum');
   const defaultValues = {
     string: "''",
     number: "0",
@@ -55,6 +61,10 @@ function getDefaultValue(type) {
     "boolean[]": "[]",
     Date: "new Date()",
   }
+  const indexEnum = enumKeys.findIndex((e) => e === type)
+  if (indexEnum > -1) return `${enumKeys[indexEnum]}.${enums[keys[indexEnum]]?.[0]}`
+  if (type.includes("[]")) return '[]'
+  if (type.includes("Partial")) return '{ id: null }'
   return defaultValues[type] || "null"
 }
 
@@ -69,9 +79,11 @@ function parseJDL(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8')
   const entityRegex = /entity\s+(\w+)\s*\{([^}]*)\}/g
   const enumRegex = /enum\s+(\w+)\s*\{([^}]*)\}/g
+  const relationRegex = /relationship\s+(OneToOne|OneToMany|ManyToOne|ManyToMany)\s*\{/g;
   let match
   const entities = []
   const enums = {}
+  const relationships = [];
 
   // Parse enums
   while ((match = enumRegex.exec(content)) !== null) {
@@ -81,10 +93,54 @@ function parseJDL(filePath) {
       .map(value => value.trim())
   }
 
+  while ((match = relationRegex.exec(content)) !== null) {
+    const relationType = match[1];
+    const startIndex = match.index + match[0].length;
+
+    // Tìm phần nội dung trong {}
+    let balance = 1;
+    let endIndex = startIndex;
+
+    while (endIndex < content.length && balance > 0) {
+      if (content[endIndex] === '{') {
+        balance++;
+      } else if (content[endIndex] === '}') {
+        balance--;
+      }
+      endIndex++;
+    }
+
+    // Lấy toàn bộ nội dung bên trong { }
+    const relationshipBody = content.slice(startIndex, endIndex - 1).trim();
+
+    // Chia nhỏ từng quan hệ bên trong { }
+    const relations = relationshipBody
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line);
+
+    // Thêm từng quan hệ vào danh sách
+    relations.forEach(relationshipBody => {
+      const sourceMatch = relationshipBody.match(/^(\w+)\{([^}]+)\}/);
+
+      const targetMatch = relationshipBody.match(/to\s+(\w+)\{(\w+)}$/);
+      if (!sourceMatch || !targetMatch) {
+        console.error(`Invalid relationship format}`);
+        return;
+      }
+
+      const [_, sourceEntity, _sourceField] = sourceMatch;
+      const [__, targetEntity, _targetField] = targetMatch;
+      const sourceField = _sourceField.match(/^(\w+)\(/)?.[1] || _sourceField
+      const targetField = _targetField.match(/^(\w+)\(/)?.[1] || _targetField
+      relationships.push({ type: relationType, sourceEntity, sourceField, targetEntity, targetField });
+    });
+  }
+
   // Parse entities
   while ((match = entityRegex.exec(content)) !== null) {
     const entityName = match[1]
-    const fields = match[2]
+    let fields = match[2]
       .trim()
       .split('\n')
       .map(line => line.trim())
@@ -93,6 +149,14 @@ function parseJDL(filePath) {
         const parts = line.split(/\s+/)
         return { name: parts[0], type: mapJDLTypeToTS(parts[1], enums) }
       })
+    relationships.forEach((relationship) => {
+      if (relationship.sourceEntity === entityName) {
+        fields.push({ name: relationship.sourceField, type: `Partial${relationship.targetEntity}Model${relationship.type === 'OneToMany' || relationship.type === 'ManyToMany' ? '[]' : ''}` })
+      } else if (relationship.targetEntity === entityName) {
+        fields.push({ name: relationship.targetField, type: `Partial${relationship.sourceEntity}Model${relationship.type === 'ManyToOne' || relationship.type === 'ManyToMany' ? '[]' : ''}` })
+      }
+    })
+
 
     entities.push({ name: entityName, fields })
   }
@@ -115,6 +179,17 @@ function pluralize(word) {
 // Chuyển PascalCase hoặc camelCase thành kebab-case
 function toKebabCase(str) {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+}
+
+function buildColumnConfigs(fields) {
+  const fieldsArr =  fields
+    .map((field) => {
+      return {
+        key: field.name,
+        title: capitalizeFirstLetter(field.name),
+      }
+    })
+    return JSON.stringify(fieldsArr, null, 2)
 }
 
 // Tạo component field phù hợp với type và tên field
@@ -147,6 +222,10 @@ function generateFormFields(fields) {
         return `<SelectComponent control={control} options={enumToOptions(${type})} name="${name}" />`
       }
 
+      if (type.startsWith('Partial')) {
+        return `<SelectComponent control={control} resource="${name}" name="${name}" />`
+      }
+
       return `<InputComponent control={control} name="${name}" />`
     })
     .filter(Boolean)
@@ -167,7 +246,10 @@ const { entities, enums } = parseJDL(JDL_FILE)
 // Tạo thư mục và file cho từng entity
 entities.forEach(({ name: entity, fields }) => {
   const entityPlural = pluralize(entity)
+  console.log(entityPlural);
+
   const entityKebab = toKebabCase(entityPlural)
+  console.log(entityKebab)
   const entityCapitalized = entity.charAt(0).toUpperCase() + entity.slice(1)
 
   const entityDir = path.join(OUTPUT_DIR, entityKebab)
@@ -177,15 +259,14 @@ entities.forEach(({ name: entity, fields }) => {
   const formFields = generateFormFields(fields)
   const usedEnums = fields.map(f => f.type).filter(t => t.endsWith('Enum'))
   let enumImports = usedEnums.length > 0 ? `import { ${usedEnums.join(', ')} } from '~/models/common/enum'` : ''
-  const defaultValues = generateDefaultValues(fields)
+  const defaultValues = generateDefaultValues(fields, enums)
 
   // Tạo các file từ template
   Object.entries(templateData).forEach(([fileName, content]) => {
-    console.log(content);
-
     let newContent = content
       .replace(/{{name}}/g, entity.toLowerCase())
       .replace(/{{Name}}/g, entityCapitalized)
+      .replace(/samples/g, entityKebab)
       .replace(/sample/g, entity.toLowerCase())
       .replace(/Sample/g, entityCapitalized)
 
@@ -193,7 +274,7 @@ entities.forEach(({ name: entity, fields }) => {
     if (fileName === 'create.tsx' || fileName === 'edit.tsx') {
       newContent = newContent.replace(
         /const \{ control, formProps, saveButtonProps \} = useRefineForm\(.*?\);/s,
-        `const { control, formProps, saveButtonProps } = useRefineForm(${toCamelCase(entity)}Schema,${fileName === 'edit.tsx' ? ' data ??' : ''} ${defaultValues});`
+        `const { control, formProps, saveButtonProps } = useRefineForm(${toCamelCase(entity)}Schema,${fileName === 'edit.tsx' ? ' (data as unknown) ??' : ''} ${defaultValues});`
       )
       newContent = newContent.replace(
         /<Form[\s\S]*?>[\s\S]*?<\/Form>/g,
@@ -202,6 +283,19 @@ entities.forEach(({ name: entity, fields }) => {
       if (enumImports) {
         newContent = enumImports + '\n' + newContent
       }
+    } else if (fileName === 'list.tsx') {
+      const columnConfigs = buildColumnConfigs(fields)
+      newContent = newContent.replace(
+        /const columnConfigs: ColumnConfig\[\] = \[([\s\S]*?)\];/,
+        `const columnConfigs: ColumnConfig[] = ${columnConfigs};`
+      )
+    } else if (fileName === 'show.tsx') {
+      const showRows = fields.map((field) => `<Title level={5}>{'${capitalizeFirstLetter(field.name)}'}</Title>
+      <TextField value={data?.data?.${field.name}} />`).join("\n")
+      newContent = newContent.replace(
+        /<Show[^>]*>[\s\S]*?<\/Show>/,
+        `<Show isLoading={isLoading}>${showRows}</Show>`
+      )
     }
 
     fs.writeFileSync(path.join(entityDir, fileName), newContent)

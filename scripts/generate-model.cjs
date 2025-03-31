@@ -18,10 +18,6 @@ function toCamelCase(str) {
     .replace(/\s+|[_-]/g, '');
 }
 
-const capitalizeFirstLetter = (text) => {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-};
-
 // Chuyển entity thành kebab-case
 function toKebabCase(str) {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
@@ -143,8 +139,10 @@ function parseJDL(filePath) {
         return;
       }
 
-      const [_, sourceEntity, sourceField] = sourceMatch;
-      const [__, targetEntity, targetField] = targetMatch;
+      const [_, sourceEntity, _sourceField] = sourceMatch;
+      const [__, targetEntity, _targetField] = targetMatch;
+      const sourceField = _sourceField.match(/^(\w+)\(/)?.[1] || _sourceField
+      const targetField = _targetField.match(/^(\w+)\(/)?.[1] || _targetField
       relationships.push({ type: relationType, sourceEntity, sourceField, targetEntity, targetField });
     });
   }
@@ -180,14 +178,23 @@ function generateModel(entity, { fields, imports }, enums) {
   const fieldsContent = fields.map(f => `  ${f.name}${f.required ? '' : '?'}: ${f.tsType};`).join('\n');
   const importsRelations = imports.join('\n').replace(/\[|\]/g, '');
 
-  const schemaContent = fields
+    const schemaContent = fields
     .map(
       f =>
-        `  ${f.name}: schemaUtils.${enums.hasOwnProperty(f.type) ? `enum(${f.tsType})` : f.tsType === 'number' ? 'number' : 'string'}${f.required ? '.required()' : '.optional()'}${f.validation ? f.validation : ''},`,
+        {
+          if (f.tsType.includes('Partial')) {
+            if (f.tsType.includes('[]')) {
+              return `  ${f.name}: schemaUtils.array.default(),`
+            }
+            return `  ${f.name}: z.object({\n    id: schemaUtils.required(),\n  }),`
+          } else {
+            return `  ${f.name}: schemaUtils.${enums.hasOwnProperty(f.type) ? `enum(${f.tsType})` : f.tsType === 'number' ? 'number' : 'string'}${f.validation ? f.validation : ''}${f.required ? (f.validation ? '' : '.required()') : '.optional()'},`
+          }
+        },
     )
     .join('\n');
 
-  const content = `${importEnums}${COMMON_IMPORT}` + importsRelations + `\nimport { z } from 'zod';\nimport { schemaUtils } from '${VALIDATION_UTILS}';\n\nexport const ${toCamelCase(entity)}Schema = z.object({\n${schemaContent}\n});\n\nexport interface ${entity}Model extends BaseRecordModel {\n${fieldsContent}\n}\n\nexport type Partial${entity}Model = PartialExceptOne<${entity}Model, 'id'>;`;
+  const content = `${importEnums}${COMMON_IMPORT}` + importsRelations + `\nimport { z } from 'zod';\nimport { schemaUtils } from '${VALIDATION_UTILS}';\n\nexport const ${toCamelCase(entity)}Schema = z.object({\n${schemaContent}\n});\n\nexport interface ${entity}Model extends BaseRecordModel {\n${fieldsContent}\n}\n\nexport type Partial${entity}Model = PartialExceptOne<${entity}Model, 'id'>;\n`;
 
   fs.writeFileSync(modelPath, content);
 }

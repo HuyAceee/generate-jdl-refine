@@ -2,20 +2,22 @@ import { Edit } from '@refinedev/antd';
 import { useOne } from '@refinedev/core';
 import { Form } from 'antd';
 
-import DatePickerComponent from '~/components/common/DatePickerComponent';
-import InputComponent from '~/components/common/InputComponent';
-import InputNumberComponent from '~/components/common/InputNumberComponent';
-import { InputTagComponent } from '~/components/common/InputTagComponent';
-import SelectComponent from '~/components/common/SelectComponent';
-import { TextAreaComponent } from '~/components/common/TextAreaComponent';
-import { TextEditorComponent } from '~/components/common/TextEditorComponent';
+import {
+  InputComponent,
+  TextEditorComponent,
+  TextAreaComponent,
+  SelectComponent,
+  InputNumberComponent,
+  DatePickerComponent,
+  InputTagComponent,
+} from '~/components/common';
 import { useRefineForm } from '~/hooks/useRefineForm';
 import { StatusEnum } from '~/models/common/enum';
 import { SampleModel, sampleSchema } from '~/models/pages/sample';
 import { enumToOptions } from '~/utils/common';
 
 export const SampleEdit = () => {
-  const { data, isLoading } = useOne<SampleModel>({ resource: 'sample' });
+  const { data, isLoading } = useOne<SampleModel>({ resource: 'samples' });
   const { control, formProps, saveButtonProps } = useRefineForm(sampleSchema, data?.data);
 
   return (

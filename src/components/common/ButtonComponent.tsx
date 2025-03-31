@@ -41,7 +41,7 @@ const getButtonStyles = (typeButton: ButtonComponentProps['typeButton']) => {
   }
 };
 
-export const ButtonComponent: React.FC<ButtonComponentProps> = ({ typeButton, className, icon, label, ...rest }) => {
+const ButtonComponent: React.FC<ButtonComponentProps> = ({ typeButton, className, icon, label, ...rest }) => {
   const { icon: defaultIcon, className: defaultClassName, label: defaultText } = getButtonStyles(typeButton);
 
   const combinedClassName = clsx('h-10 rounded-xl', defaultClassName, className, {
@@ -54,3 +54,5 @@ export const ButtonComponent: React.FC<ButtonComponentProps> = ({ typeButton, cl
     </Button>
   );
 };
+
+export default ButtonComponent;
