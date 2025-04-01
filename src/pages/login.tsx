@@ -2,7 +2,7 @@ import { ThemedTitleV2 } from '@refinedev/antd';
 import { useLogin } from '@refinedev/core';
 import { Button, Layout, Space, Typography } from 'antd';
 
-export const Login: React.FC = () => {
+const Login: React.FC = () => {
   const { mutate: login } = useLogin();
 
   return (
@@ -37,3 +37,5 @@ export const Login: React.FC = () => {
     </Layout>
   );
 };
+
+export default Login;

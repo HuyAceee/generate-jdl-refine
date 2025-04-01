@@ -15,7 +15,7 @@ import { StatusEnum } from '~/models/common/enum';
 import { sampleSchema } from '~/models/pages/sample';
 import { enumToOptions } from '~/utils/common';
 
-export const SampleCreate = () => {
+const SampleCreate = () => {
   const { control, formProps, saveButtonProps } = useRefineForm(sampleSchema, {
     title: '',
     content: '',
@@ -40,3 +40,5 @@ export const SampleCreate = () => {
     </Create>
   );
 };
+
+export default SampleCreate;

@@ -1,30 +1,28 @@
 const fs = require('fs')
 const path = require('path')
 
-const JDL_FILE = process.argv[2] // Nhận file JDL từ tham số dòng lệnh
+const JDL_FILE = process.argv[2] // Get JDL file from command line parameter
 const TEMPLATE_FILE = path.join(__dirname, 'template.json')
 const OUTPUT_DIR = path.join(__dirname, '../src', 'pages')
 
-// Kiểm tra nếu không có file JDL được truyền vào
+// Check if no JDL file is passed
 if (!JDL_FILE) {
-  console.error('❌ Vui lòng cung cấp file JDL. Ví dụ: node scripts/generate-page.cjs jhipster-jdl.jdl')
+  console.error('❌ Please provide the JDL file. Example: node scripts/generate-page.cjs jhipster-jdl.jdl');
   process.exit(1)
 }
 
 function toCamelCase(str) {
   return str
-    .toLowerCase()
-    .replace(/(?:^\w|[A-Z]|\b\w)/g, (match, index) =>
-      index === 0 ? match.toLowerCase() : match.toUpperCase()
-    )
-    .replace(/\s+|[_-]/g, '');
+    .replace(/_./g, match => match.charAt(1).toUpperCase())
+    .replace(/-/g, '')
+    .replace(/^./, match => match.toLowerCase());
 }
 
 function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// Chuyển kiểu JDL sang TypeScript (fix lỗi enum bị any)
+// Convert JDL type to TypeScript (fix enum error with any)
 function mapJDLTypeToTS(jdlType, enums) {
   return enums.hasOwnProperty(jdlType)
     ? `${jdlType}Enum`
@@ -48,7 +46,7 @@ function generateDefaultValues(fields, enums) {
     .join('\n')}\n}`
 }
 
-// Mapping kiểu dữ liệu sang giá trị mặc định
+// Mapping data type to default value
 function getDefaultValue(type) {
   const keys = Object.keys(enums);
   const enumKeys = keys.map(key => key + 'Enum');
@@ -69,10 +67,9 @@ function getDefaultValue(type) {
 }
 
 
-// Đọc file JDL để lấy danh sách entity và enum
 function parseJDL(filePath) {
   if (!fs.existsSync(filePath)) {
-    console.error(`❌ Không tìm thấy file JDL: ${filePath}`)
+    console.error(`❌ Cannot find file JDL: ${filePath}`)
     process.exit(1)
   }
 
@@ -97,7 +94,7 @@ function parseJDL(filePath) {
     const relationType = match[1];
     const startIndex = match.index + match[0].length;
 
-    // Tìm phần nội dung trong {}
+    // Find the content in {}
     let balance = 1;
     let endIndex = startIndex;
 
@@ -110,16 +107,16 @@ function parseJDL(filePath) {
       endIndex++;
     }
 
-    // Lấy toàn bộ nội dung bên trong { }
+    // Get all the content inside { }
     const relationshipBody = content.slice(startIndex, endIndex - 1).trim();
 
-    // Chia nhỏ từng quan hệ bên trong { }
+    // Split each relationship inside { }
     const relations = relationshipBody
       .split('\n')
       .map(line => line.trim())
       .filter(line => line);
 
-    // Thêm từng quan hệ vào danh sách
+    // Add each relation to the list
     relations.forEach(relationshipBody => {
       const sourceMatch = relationshipBody.match(/^(\w+)\{([^}]+)\}/);
 
@@ -131,8 +128,8 @@ function parseJDL(filePath) {
 
       const [_, sourceEntity, _sourceField] = sourceMatch;
       const [__, targetEntity, _targetField] = targetMatch;
-      const sourceField = _sourceField.match(/^(\w+)\(/)?.[1] || _sourceField
-      const targetField = _targetField.match(/^(\w+)\(/)?.[1] || _targetField
+      const sourceField = _sourceField.match(/^(\w+)\(/)?.[1] || _sourceField;
+      const targetField = _targetField.match(/^(\w+)\(/)?.[1] || _targetField;
       relationships.push({ type: relationType, sourceEntity, sourceField, targetEntity, targetField });
     });
   }
@@ -157,26 +154,25 @@ function parseJDL(filePath) {
       }
     })
 
-
     entities.push({ name: entityName, fields })
   }
 
   if (entities.length === 0) {
-    console.error('❌ Không tìm thấy entity nào trong file JDL.')
+    console.error('❌ No entity found in JDL file.');
     process.exit(1)
   }
 
   return { entities, enums }
 }
 
-// Chuyển entity sang plural-form
+// Convert entity to plural-form
 function pluralize(word) {
   if (word.endsWith('y')) return word.slice(0, -1) + 'ies'
   if (word.endsWith('s')) return word + 'es'
   return word + 's'
 }
 
-// Chuyển PascalCase hoặc camelCase thành kebab-case
+// Convert PascalCase or camelCase to kebab-case
 function toKebabCase(str) {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 }
@@ -234,22 +230,19 @@ function generateFormFields(fields) {
 
 // Đọc template từ file JSON
 if (!fs.existsSync(TEMPLATE_FILE)) {
-  console.error('❌ Không tìm thấy file template.json')
+  console.error('❌ Not found file template.json');
   process.exit(1)
 }
 
 const templateData = JSON.parse(fs.readFileSync(TEMPLATE_FILE, 'utf-8')).files
 
-// Lấy danh sách entity và enum từ JDL
+// Get list of entities and enums from JDL
 const { entities, enums } = parseJDL(JDL_FILE)
 
-// Tạo thư mục và file cho từng entity
+// Create folders and files for each entity
 entities.forEach(({ name: entity, fields }) => {
   const entityPlural = pluralize(entity)
-  console.log(entityPlural);
-
   const entityKebab = toKebabCase(entityPlural)
-  console.log(entityKebab)
   const entityCapitalized = entity.charAt(0).toUpperCase() + entity.slice(1)
 
   const entityDir = path.join(OUTPUT_DIR, entityKebab)
@@ -258,7 +251,7 @@ entities.forEach(({ name: entity, fields }) => {
   // Generate form fields
   const formFields = generateFormFields(fields)
   const usedEnums = fields.map(f => f.type).filter(t => t.endsWith('Enum'))
-  let enumImports = usedEnums.length > 0 ? `import { ${usedEnums.join(', ')} } from '~/models/common/enum'` : ''
+  const enumImports = usedEnums.length > 0 ? `import { ${usedEnums.join(', ')} } from '~/models/common/enum'` : ''
   const defaultValues = generateDefaultValues(fields, enums)
 
   // Tạo các file từ template
@@ -266,42 +259,45 @@ entities.forEach(({ name: entity, fields }) => {
     let newContent = content
       .replace(/{{name}}/g, entity.toLowerCase())
       .replace(/{{Name}}/g, entityCapitalized)
-      .replace(/samples/g, entityKebab)
-      .replace(/sample/g, entity.toLowerCase())
-      .replace(/Sample/g, entityCapitalized)
+      .replace(/samples/g, pluralize(entityKebab))
+      .replace(/sample/g, toCamelCase(entity))
+      .replace(/Sample/g, entityCapitalized);
 
-    // Chèn form fields vào create.tsx và edit.tsx
+    newContent = newContent.replace(`~/models/pages/${toCamelCase(entity)}`, `~/models/pages/${entityKebab}`)
+
+    // Insert form fields into create.tsx and edit.tsx
     if (fileName === 'create.tsx' || fileName === 'edit.tsx') {
       newContent = newContent.replace(
         /const \{ control, formProps, saveButtonProps \} = useRefineForm\(.*?\);/s,
-        `const { control, formProps, saveButtonProps } = useRefineForm(${toCamelCase(entity)}Schema,${fileName === 'edit.tsx' ? ' (data as unknown) ??' : ''} ${defaultValues});`
-      )
+        `const { control, formProps, saveButtonProps } = useRefineForm(${toCamelCase(entity)}Schema,${fileName === 'edit.tsx' ? ' (data as unknown) ??' : ''} ${defaultValues});`,
+      );
       newContent = newContent.replace(
         /<Form[\s\S]*?>[\s\S]*?<\/Form>/g,
-        `<Form {...formProps} layout="vertical">\n        ${formFields}\n      </Form>`
-      )
+        `<Form {...formProps} layout="vertical">\n        ${formFields}\n      </Form>`,
+      );
       if (enumImports) {
-        newContent = enumImports + '\n' + newContent
+        newContent = enumImports + '\n' + newContent;
       }
     } else if (fileName === 'list.tsx') {
-      const columnConfigs = buildColumnConfigs(fields)
+      const columnConfigs = buildColumnConfigs(fields);
       newContent = newContent.replace(
         /const columnConfigs: ColumnConfig\[\] = \[([\s\S]*?)\];/,
-        `const columnConfigs: ColumnConfig[] = ${columnConfigs};`
-      )
+        `const columnConfigs: ColumnConfig[] = ${columnConfigs};`,
+      );
     } else if (fileName === 'show.tsx') {
-      const showRows = fields.map((field) => `<Title level={5}>{'${capitalizeFirstLetter(field.name)}'}</Title>
-      <TextField value={data?.data?.${field.name}} />`).join("\n")
-      newContent = newContent.replace(
-        /<Show[^>]*>[\s\S]*?<\/Show>/,
-        `<Show isLoading={isLoading}>${showRows}</Show>`
-      )
+      const showRows = fields
+        .map(
+          field => `<Title level={5}>{'${capitalizeFirstLetter(field.name)}'}</Title>
+      <TextField value={data?.data?.${field.name}${field.type.includes('Partial') ? '?.id' : ''}} />`,
+        )
+        .join('\n');
+      newContent = newContent.replace(/<Show[^>]*>[\s\S]*?<\/Show>/, `<Show isLoading={isLoading}>${showRows}</Show>`);
     }
 
-    fs.writeFileSync(path.join(entityDir, fileName), newContent)
+    fs.writeFileSync(path.join(entityDir, fileName), newContent);
   })
 
-  console.log(`✅ Đã tạo thư mục ${entityDir} và các file bên trong`)
+  console.log(`✅ Created directory ${entityDir} and files inside`);
 })
 
-console.log('🎉 Hoàn thành!')
+console.log('🎉 Completed!');

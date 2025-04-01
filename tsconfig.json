@@ -28,7 +28,7 @@
       "~/*": ["src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "scripts"],
   "exclude": ["__mock__", "node_modules"],
   "references": [
     {

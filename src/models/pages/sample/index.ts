@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { NewModel, PartialNewModel } from '../news';
-
 import { BaseRecordModel, PartialExceptOne } from '~/models/common';
 import { StatusEnum } from '~/models/common/enum';
 import { schemaUtils } from '~/utils/validation';
@@ -23,7 +21,6 @@ export const sampleSchema = z.object({
 export interface SampleModel extends BaseRecordModel {
   title: string;
   content: string;
-  new: PartialNewModel;
   description: string;
   status: StatusEnum;
   email?: string;
@@ -32,4 +29,4 @@ export interface SampleModel extends BaseRecordModel {
   tags?: string[];
 }
 
-export type PartialSampleModel = PartialExceptOne<NewModel, 'id'>;
+export type PartialSampleModel = PartialExceptOne<SampleModel, 'id'>;

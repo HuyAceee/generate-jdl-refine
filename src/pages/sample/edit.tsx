@@ -16,7 +16,7 @@ import { StatusEnum } from '~/models/common/enum';
 import { SampleModel, sampleSchema } from '~/models/pages/sample';
 import { enumToOptions } from '~/utils/common';
 
-export const SampleEdit = () => {
+const SampleEdit = () => {
   const { data, isLoading } = useOne<SampleModel>({ resource: 'samples' });
   const { control, formProps, saveButtonProps } = useRefineForm(sampleSchema, data?.data);
 
@@ -36,3 +36,5 @@ export const SampleEdit = () => {
     </Edit>
   );
 };
+
+export default SampleEdit;

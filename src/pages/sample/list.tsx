@@ -30,10 +30,12 @@ const columnConfigs: ColumnConfig[] = [
   },
 ];
 
-export const SampleList = () => {
+const SampleList = () => {
   return (
     <List>
       <TableComponent columnConfig={columnConfigs} role="admin" />
     </List>
   );
 };
+
+export default SampleList;

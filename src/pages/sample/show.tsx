@@ -6,7 +6,7 @@ import { SampleModel } from '~/models/pages/sample';
 
 const { Title } = Typography;
 
-export const SampleShow = () => {
+const SampleShow = () => {
   const { data, isLoading } = useOne<SampleModel>({ resource: 'sample' });
   return (
     <Show isLoading={isLoading}>
@@ -18,8 +18,6 @@ export const SampleShow = () => {
       <MarkdownField value={data?.data?.content} />
       <Title level={5}>{'Description'}</Title>
       <MarkdownField value={data?.data?.description} />
-      <Title level={5}>{'New'}</Title>
-      <TextField value={data?.data?.new?.name} />
       <Title level={5}>{'Status'}</Title>
       <TextField value={data?.data?.status} />
       <Title level={5}>{'CreatedAt'}</Title>
@@ -27,3 +25,5 @@ export const SampleShow = () => {
     </Show>
   );
 };
+
+export default SampleShow;
