@@ -1,4 +1,5 @@
 @import url('./app.css');
+@import url('./custom-common.css');
 
 .ant-layout-sider,
 .ant-layout-sider-trigger,

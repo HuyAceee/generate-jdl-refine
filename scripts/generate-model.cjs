@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const JDL_FILE = process.argv[2];
+
 const MODEL_DIR = path.join(__dirname, '../src', 'models');
 const COMMON_MODEL_DIR = path.join(MODEL_DIR, 'common');
 const ENTITY_MODEL_DIR = path.join(MODEL_DIR, 'pages');
@@ -11,20 +12,19 @@ const COMMON_IMPORT = "import { BaseRecordModel, PartialExceptOne } from '~/mode
 
 function toCamelCase(str) {
   return str
-    .toLowerCase()
-    .replace(/(?:^\w|[A-Z]|\b\w)/g, (match, index) =>
-      index === 0 ? match.toLowerCase() : match.toUpperCase()
-    )
-    .replace(/\s+|[_-]/g, '');
+    .replace(/_./g, match => match.charAt(1).toUpperCase())
+    .replace(/-/g, '')
+    .replace(/^./, match => match.toLowerCase());
 }
 
-const capitalizeFirstLetter = (text) => {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-};
-
-// Chuyển entity thành kebab-case
 function toKebabCase(str) {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+}
+
+function pluralize(word) {
+  if (word.endsWith('y')) return word.slice(0, -1) + 'ies'
+  if (word.endsWith('s')) return word + 'es'
+  return word + 's'
 }
 
 // Tạo validation schema từ constraints
@@ -143,11 +143,14 @@ function parseJDL(filePath) {
         return;
       }
 
-      const [_, sourceEntity, sourceField] = sourceMatch;
-      const [__, targetEntity, targetField] = targetMatch;
+      const [_, sourceEntity, _sourceField] = sourceMatch;
+      const [__, targetEntity, _targetField] = targetMatch;
+      const sourceField = _sourceField.match(/^(\w+)\(/)?.[1] || _sourceField
+      const targetField = _targetField.match(/^(\w+)\(/)?.[1] || _targetField
       relationships.push({ type: relationType, sourceEntity, sourceField, targetEntity, targetField });
     });
   }
+  console.log('1233333333333333', entities);
 
   return { entities, enums, relationships };
 }
@@ -168,7 +171,7 @@ function generateEnums(enums) {
 
 // Tạo model interface và schema validation
 function generateModel(entity, { fields, imports }, enums) {
-  const entityFolder = toKebabCase(entity);
+  const entityFolder = toKebabCase(pluralize(entity));
   const entityDir = path.join(ENTITY_MODEL_DIR, entityFolder);
   fs.mkdirSync(entityDir, { recursive: true });
   const modelPath = path.join(entityDir, 'index.ts');
@@ -180,22 +183,33 @@ function generateModel(entity, { fields, imports }, enums) {
   const fieldsContent = fields.map(f => `  ${f.name}${f.required ? '' : '?'}: ${f.tsType};`).join('\n');
   const importsRelations = imports.join('\n').replace(/\[|\]/g, '');
 
-  const schemaContent = fields
+    const schemaContent = fields
     .map(
       f =>
-        `  ${f.name}: schemaUtils.${enums.hasOwnProperty(f.type) ? `enum(${f.tsType})` : f.tsType === 'number' ? 'number' : 'string'}${f.required ? '.required()' : '.optional()'}${f.validation ? f.validation : ''},`,
+        {
+          if (f.tsType.includes('Partial')) {
+            if (f.tsType.includes('[]')) {
+              return `  ${f.name}: schemaUtils.array.default(),`
+            }
+            return `  ${f.name}: z.object({\n    id: schemaUtils.required(),\n  }),`
+          } else {
+            return `  ${f.name}: schemaUtils.${enums.hasOwnProperty(f.type) ? `enum(${f.tsType})` : f.tsType === 'number' ? 'number' : 'string'}${f.validation ? f.validation : ''}${f.required ? (f.validation ? '' : '.required()') : '.optional()'},`
+          }
+        },
     )
     .join('\n');
 
-  const content = `${importEnums}${COMMON_IMPORT}` + importsRelations + `\nimport { z } from 'zod';\nimport { schemaUtils } from '${VALIDATION_UTILS}';\n\nexport const ${toCamelCase(entity)}Schema = z.object({\n${schemaContent}\n});\n\nexport interface ${entity}Model extends BaseRecordModel {\n${fieldsContent}\n}\n\nexport type Partial${entity}Model = PartialExceptOne<${entity}Model, 'id'>;`;
+  const content = `${importEnums}${COMMON_IMPORT}` + importsRelations + `\nimport { z } from 'zod';\nimport { schemaUtils } from '${VALIDATION_UTILS}';\n\nexport const ${toCamelCase(entity)}Schema = z.object({\n${schemaContent}\n});\n\nexport interface ${entity}Model extends BaseRecordModel {\n${fieldsContent}\n}\n\nexport type Partial${entity}Model = PartialExceptOne<${entity}Model, 'id'>;\n`;
 
   fs.writeFileSync(modelPath, content);
 }
 
 function applyRelationships(entities, relationships) {
+  console.log('relationships: ', relationships);
+
   relationships.forEach(({ type, sourceEntity, sourceField, targetEntity, targetField }) => {
-    const sourceType = type.includes('Many') ? `Partial${targetEntity}Model[]` : `Partial${targetEntity}Model`;
-    const targetType = type.includes('Many') ? `Partial${sourceEntity}Model[]` : `Partial${sourceEntity}Model`;
+    const sourceType = type.includes('Many') ? `Partial${targetEntity}Model` : `Partial${targetEntity}Model[]`;
+    const targetType = type.includes('Many') ? `Partial${sourceEntity}Model` : `Partial${sourceEntity}Model[]`;
 
     if (!entities[sourceEntity].fields.some(f => f.name === sourceField)) {
       entities[sourceEntity].fields.push({ name: sourceField, tsType: sourceType });
@@ -204,8 +218,8 @@ function applyRelationships(entities, relationships) {
       entities[targetEntity].fields.push({ name: targetField, tsType: targetType });
     }
 
-    entities[sourceEntity].imports.push(`import { ${sourceType} } from '../${toKebabCase(targetEntity)}';`);
-    entities[targetEntity].imports.push(`import { ${targetType} } from '../${toKebabCase(sourceEntity)}';`);
+    entities[sourceEntity].imports.push(`import { ${sourceType} } from '../${toKebabCase(pluralize(targetEntity))}';`);
+    entities[targetEntity].imports.push(`import { ${targetType} } from '../${toKebabCase(pluralize(sourceEntity))}';`);
   });
 }
 
@@ -216,6 +230,8 @@ function generateFromJDL() {
   }
 
   const { entities, enums, relationships } = parseJDL(JDL_FILE);
+  console.log('entity: ' + entities, Array.isArray(entities));
+
   applyRelationships(entities, relationships);
   generateEnums(enums);
 

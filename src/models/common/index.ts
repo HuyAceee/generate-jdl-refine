@@ -13,6 +13,6 @@ export type PartialExceptOne<T, K extends keyof T> = Partial<Omit<T, K>> & Pick<
 
 export interface BaseRecordModel {
   id?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
 }

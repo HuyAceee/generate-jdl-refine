@@ -16,7 +16,7 @@ interface TextAreaComponentProps extends TextAreaProps {
   control: Control<FieldValues>;
 }
 
-export const TextAreaComponent: React.FC<TextAreaComponentProps> = ({
+const TextAreaComponent: React.FC<TextAreaComponentProps> = ({
   label,
   placeholderLines,
   name,
@@ -73,3 +73,5 @@ export const TextAreaComponent: React.FC<TextAreaComponentProps> = ({
     </Form.Item>
   );
 };
+
+export default TextAreaComponent;

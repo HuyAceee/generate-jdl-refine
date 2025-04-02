@@ -36,3 +36,5 @@ export const TextEditorComponent: React.FC<TextEditorProps> = ({ label, name, co
     </Form.Item>
   );
 };
+
+export default TextEditorComponent;

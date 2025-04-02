@@ -17,6 +17,7 @@ const config = {
     // 'jsx-a11y',
     'react',
     'react-hooks',
+    'unused-imports'
   ],
   extends: [
     'eslint:recommended',
@@ -24,13 +25,14 @@ const config = {
     'plugin:prettier/recommended',
     'plugin:@typescript-eslint/recommended',
     // 'plugin:jsx-a11y/recommended',
-    'plugin:tailwindcss/recommended',
+    'plugin:tailwindcss/recommended'
   ],
   rules: {
     // Tailwind CSS
     'tailwindcss/no-custom-classname': 'off',
 
     // General
+    'unused-imports/no-unused-imports': 'error',
     'prettier/prettier': [
       'error',
       {

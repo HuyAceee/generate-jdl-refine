@@ -1,25 +1,27 @@
 import { Create } from '@refinedev/antd';
 import { Form } from 'antd';
 
-import DatePickerComponent from '~/components/common/DatePickerComponent';
-import InputComponent from '~/components/common/InputComponent';
-import InputNumberComponent from '~/components/common/InputNumberComponent';
-import { InputTagComponent } from '~/components/common/InputTagComponent';
-import SelectComponent from '~/components/common/SelectComponent';
-import { TextAreaComponent } from '~/components/common/TextAreaComponent';
-import { TextEditorComponent } from '~/components/common/TextEditorComponent';
+import {
+  InputComponent,
+  TextEditorComponent,
+  TextAreaComponent,
+  SelectComponent,
+  InputNumberComponent,
+  DatePickerComponent,
+  InputTagComponent,
+} from '~/components/common';
 import { useRefineForm } from '~/hooks/useRefineForm';
 import { StatusEnum } from '~/models/common/enum';
 import { sampleSchema } from '~/models/pages/sample';
 import { enumToOptions } from '~/utils/common';
 
-export const SampleCreate = () => {
+const SampleCreate = () => {
   const { control, formProps, saveButtonProps } = useRefineForm(sampleSchema, {
     title: '',
     content: '',
     description: '',
     new: { id: '' },
-    status: StatusEnum.DRAFT,
+    status: StatusEnum.ACTIVE,
   });
 
   return (
@@ -38,3 +40,5 @@ export const SampleCreate = () => {
     </Create>
   );
 };
+
+export default SampleCreate;

@@ -2,12 +2,11 @@ import { List } from '@refinedev/antd';
 
 import TableComponent from '~/components/common/TableComponent';
 import { ColumnConfig } from '~/models/common';
-import { NewModel } from '~/models/pages/news';
 
 const columnConfigs: ColumnConfig[] = [
   {
     key: 'id',
-    title: 'ID',
+    title: 'Id',
   },
   {
     key: 'title',
@@ -24,9 +23,6 @@ const columnConfigs: ColumnConfig[] = [
   {
     key: 'new',
     title: 'New',
-    render: (record: NewModel) => {
-      return record.name;
-    },
   },
   {
     key: 'status',
@@ -34,10 +30,12 @@ const columnConfigs: ColumnConfig[] = [
   },
 ];
 
-export const SampleList = () => {
+const SampleList = () => {
   return (
     <List>
       <TableComponent columnConfig={columnConfigs} role="admin" />
     </List>
   );
 };
+
+export default SampleList;

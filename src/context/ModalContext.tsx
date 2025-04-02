@@ -1,7 +1,7 @@
 import { ModalProps } from 'antd';
 import React, { createContext, useContext, useState } from 'react';
 
-import CommonModal from '../components/common/modal/CommonModal';
+import CommonModal from '../components/common/CommonModal';
 
 interface ModalContextProps {
   openModal: (content: React.ReactNode, props?: ModalProps & { hiddenClose?: boolean }) => void;

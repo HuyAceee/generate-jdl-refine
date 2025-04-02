@@ -11,11 +11,15 @@ application {
     prodDatabaseType postgresql
     cacheProvider ehcache
     enableHibernateCache true
-    testFrameworks [cypress, jest]
+    testFrameworks [cypress]
     clientTheme materia
     skipUserManagement true
   }
   entities *
+}
+
+enum Status {
+  ACTIVE, INACTIVE
 }
 
 enum Role {
@@ -27,13 +31,14 @@ enum Gender {
 }
 
 entity Employee {
-  username String required unique min(3) max(20)
-  email String required unique
+  username String required min(3) max(20)
+  email String required
   password String required
   phoneNumber String required
   url String
-  role Role required
-  gender Gender required
+  role Role
+  gender Gender
+  status Status
 }
 
 entity Profile {

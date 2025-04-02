@@ -36,13 +36,21 @@ export const schemaUtils = {
     phone: (message?: string) => z.string().regex(/^\+?[1-9]\d{1,14}$/, message ?? validationMessages.string.phone),
     pattern: (regex: RegExp, message?: string) => z.string().regex(regex, message ?? validationMessages.string.pattern),
     required: (message?: string) => z.string().min(1, message ?? validationMessages.required),
+    optional: () => z.string().optional(),
   },
   number: {
     default: (message?: string) => z.number({ message: message ?? validationMessages.number.default }),
     min: (value: number, message?: string) => z.number().min(value, message ?? validationMessages.number.min(value)),
     max: (value: number, message?: string) => z.number().max(value, message ?? validationMessages.number.max(value)),
+    required: (message?: string) => z.number().min(1, message ?? validationMessages.required),
+    optional: () => z.number().optional(),
   },
   array: {
+    default: () => z.array(z.any()).optional(),
+    required: (message?: string) => z.array(z.any()).min(1, message ?? validationMessages.required),
+    optional: () => z.array(z.any()).optional(),
+    minItems: (length: number, message?: string) =>
+      z.array(z.any()).min(length, message ?? validationMessages.array.min(length)),
     min: (length: number, message?: string) =>
       z.array(z.any()).min(length, message ?? validationMessages.array.min(length)),
   },

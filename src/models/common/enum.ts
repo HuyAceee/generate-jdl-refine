@@ -1,7 +1,6 @@
 export enum StatusEnum {
-  DRAFT = 'draft',
-  PUBLISHED = 'published',
-  REJECTED = 'rejected',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
 }
 
 export enum RoleEnum {

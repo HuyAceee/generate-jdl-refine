@@ -1,6 +1,5 @@
 import { Modal, ModalProps, Button } from 'antd';
 import React from 'react';
-import './common-modal.css';
 
 type CommonModalProps = ModalProps & {
   hiddenClose?: boolean;
