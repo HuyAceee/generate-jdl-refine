@@ -79,7 +79,7 @@
     "generate-pages": "node scripts/generate-page.cjs",
     "generate-models": "node scripts/generate-model.cjs",
     "generate": "pnpm run generate-models && pnpm run generate-pages",
-    "postinstall": "chmod +x .husky/*.sh && npm run lint"
+    "postinstall": "npm run lint"
   },
   "browserslist": {
     "production": [
