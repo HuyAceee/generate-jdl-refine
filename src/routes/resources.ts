@@ -1,6 +1,6 @@
 import { ResourceProps } from '@refinedev/core';
 
-const resourcesCategories = ['sample'];
+const resourcesCategories: string[] = [];
 
 export const resources: ResourceProps[] | undefined = resourcesCategories.map(name => ({
   name,
