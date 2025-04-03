@@ -9,10 +9,6 @@ import Title from '~/components/header/Title';
 
 // Lazy import các trang
 const Login = lazy(() => import('~/pages/login'));
-const SampleList = lazy(() => import('~/pages/sample/list'));
-const SampleCreate = lazy(() => import('~/pages/sample/create'));
-const SampleEdit = lazy(() => import('~/pages/sample/edit'));
-const SampleShow = lazy(() => import('~/pages/sample/show'));
 
 export const AppRoutes = () => (
   <Suspense fallback={<div>Loading...</div>}>
@@ -30,13 +26,6 @@ export const AppRoutes = () => (
           </Authenticated>
         }
       >
-        <Route index element={<NavigateToResource resource="sample" />} />
-        <Route path="/sample">
-          <Route index element={<SampleList />} />
-          <Route path="create" element={<SampleCreate />} />
-          <Route path="edit/:id" element={<SampleEdit />} />
-          <Route path="show/:id" element={<SampleShow />} />
-        </Route>
         <Route path="*" element={<ErrorComponent />} />
       </Route>
 
