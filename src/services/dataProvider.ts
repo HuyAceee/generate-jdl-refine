@@ -1,5 +1,6 @@
 import { DataProvider, GetOneParams } from '@refinedev/core';
-import axios from 'axios';
+
+import axios from './axiosInstance';
 
 export const dataProvider: DataProvider = {
   getList: async ({ resource, pagination }) => {
@@ -10,7 +11,7 @@ export const dataProvider: DataProvider = {
       size: pageSize.toString(),
     });
 
-    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/${resource}?${queryParams}`);
+    const response = await axios.get(`${resource}?${queryParams}`);
 
     return {
       data: response.data.data,
@@ -19,22 +20,22 @@ export const dataProvider: DataProvider = {
   },
 
   getOne: async <T>({ resource, id }: GetOneParams): Promise<{ data: T }> => {
-    const response = await axios.get<T>(`${import.meta.env.VITE_BASE_URL}/${resource}/${id}`);
+    const response = await axios.get<T>(`${resource}/${id}`);
     return { data: response.data };
   },
 
   create: async ({ resource, variables }) => {
-    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/${resource}`, variables);
+    const response = await axios.post(`${resource}`, variables);
     return { data: response.data };
   },
 
   update: async ({ resource, id, variables }) => {
-    const response = await axios.put(`${import.meta.env.VITE_BASE_URL}/${resource}/${id}`, variables);
+    const response = await axios.put(`${resource}/${id}`, variables);
     return { data: response.data };
   },
 
   deleteOne: async ({ resource, id }) => {
-    return await axios.delete(`${import.meta.env.VITE_BASE_URL}/${resource}/${id}`);
+    return await axios.delete(`${resource}/${id}`);
   },
   getApiUrl: () => import.meta.env.VITE_BASE_URL,
 };

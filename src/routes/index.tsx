@@ -4,6 +4,8 @@ import { CatchAllNavigate, NavigateToResource } from '@refinedev/react-router';
 import { lazy, Suspense } from 'react';
 import { Outlet, Route, Routes } from 'react-router';
 
+import ResourceRoutes from './resource.routes';
+
 import { Header } from '~/components/header/Header';
 import Title from '~/components/header/Title';
 
@@ -26,6 +28,7 @@ export const AppRoutes = () => (
           </Authenticated>
         }
       >
+        <ResourceRoutes />
         <Route path="*" element={<ErrorComponent />} />
       </Route>
 
