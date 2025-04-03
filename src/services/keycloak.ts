@@ -5,3 +5,22 @@ export const keycloak = new Keycloak({
   url: import.meta.env.VITE_BASE_URL_KEYCLOAK,
   realm: import.meta.env.VITE_KEYCLOAK_REALM,
 });
+
+export const initializeKeycloak = () => {
+  return new Promise((resolve, reject) => {
+    keycloak
+      .init({ onLoad: 'login-required' })
+      .then(authenticated => {
+        if (authenticated) {
+          resolve(keycloak);
+        } else {
+          reject('Keycloak authentication failed');
+        }
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+};
+
+export default keycloak;

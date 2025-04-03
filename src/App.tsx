@@ -1,4 +1,4 @@
-import { ReactKeycloakProvider, useKeycloak } from '@react-keycloak/web';
+import { useKeycloak } from '@react-keycloak/web';
 import { useNotificationProvider } from '@refinedev/antd';
 import '@refinedev/antd/dist/reset.css';
 import { Refine } from '@refinedev/core';
@@ -21,7 +21,6 @@ import { AppRoutes } from './routes';
 import { resources } from './routes/resources';
 import { authProvider } from './services/authProvider';
 import { dataProvider } from './services/dataProvider';
-import { keycloak } from './services/keycloak';
 import { store } from './store';
 
 function App() {
@@ -45,28 +44,26 @@ function App() {
             <ColorModeContextProvider>
               <AntdApp>
                 <DevtoolsProvider>
-                  <ReactKeycloakProvider authClient={keycloak}>
-                    <Refine
-                      dataProvider={dataProvider}
-                      notificationProvider={useNotificationProvider}
-                      routerProvider={routerBindings}
-                      authProvider={authProvider}
-                      resources={resources}
-                      i18nProvider={i18nProvider}
-                      options={{
-                        syncWithLocation: true,
-                        warnWhenUnsavedChanges: true,
-                        useNewQueryKeys: true,
-                        projectId: 'xiAile-rOluTO-RIMJ5f',
-                      }}
-                    >
-                      <AppRoutes />
+                  <Refine
+                    dataProvider={dataProvider}
+                    notificationProvider={useNotificationProvider}
+                    routerProvider={routerBindings}
+                    authProvider={authProvider}
+                    resources={resources}
+                    i18nProvider={i18nProvider}
+                    options={{
+                      syncWithLocation: true,
+                      warnWhenUnsavedChanges: true,
+                      useNewQueryKeys: true,
+                      projectId: 'xiAile-rOluTO-RIMJ5f',
+                    }}
+                  >
+                    <AppRoutes />
 
-                      <RefineKbar />
-                      <UnsavedChangesNotifier />
-                      <DocumentTitleHandler />
-                    </Refine>
-                  </ReactKeycloakProvider>
+                    <RefineKbar />
+                    <UnsavedChangesNotifier />
+                    <DocumentTitleHandler />
+                  </Refine>
                   <DevtoolsPanel />
                 </DevtoolsProvider>
               </AntdApp>
