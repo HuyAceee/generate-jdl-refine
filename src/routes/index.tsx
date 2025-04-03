@@ -28,7 +28,7 @@ export const AppRoutes = () => (
           </Authenticated>
         }
       >
-        <ResourceRoutes />
+        {ResourceRoutes()}
         <Route path="*" element={<ErrorComponent />} />
       </Route>
 
